@@ -6,6 +6,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 you can get the english version change log at [Github Release](https://github.com/Tencent/puerts/releases)
 
+## [1.4.0-preview.6] - 2022-07-25
+1. 支持同时连接多个inspector调试端
+2. 修复unity2021.3.4+ inspector崩溃的问题
+3. fix #708
+4. unity2018- 禁用generic wrapper
+
 ## [1.4.0-preview.5] - 2022-07-08
 1. android、ios平台的v8降到8.4以规避 #908
 2. 修复 #907
