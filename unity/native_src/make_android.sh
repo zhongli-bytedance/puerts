@@ -4,13 +4,7 @@ then
     ENGINE="v8"
 fi
 
-if [ -n "$ANDROID_NDK" ]; then
-    export NDK=${ANDROID_NDK}
-elif [ -n "$ANDROID_NDK_HOME" ]; then
-    export NDK=${ANDROID_NDK_HOME}
-else
-    export NDK=~/android-ndk-r21b
-fi
+export NDK=~/android-ndk-r21b
 
 if [ ! -d "$NDK" ]; then
     echo "Please set ANDROID_NDK environment to the root of NDK."
