@@ -32,12 +32,6 @@ jobs:
       - name: Build
         run: |
           ls ~/android-ndk-r21b
-          echo "1"
-          ls -l /usr/local/lib/android/sdk/ndk/25.0.8775105
-          echo "2"
-          ls -l ~/android-ndk-r21b/toolchains/llvm/prebuilt/linux-x86_64/bin
-          echo "3"
-          ls -l /usr/local/lib/android/sdk/ndk/25.0.8775105/toolchains/llvm/prebuilt/linux-x86_64/bin
           cd unity/native_src
           chmod 777 make_android.sh
           ./make_android.sh
