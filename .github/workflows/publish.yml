@@ -13,6 +13,10 @@ jobs:
     
     steps:
       - uses: actions/checkout@v2
+      - name: Print
+        run: |
+          echo '${{ toJSON(github) }}'
+          echo '${{github.runId}}'
       - name: Download artifact
         uses: dawidd6/action-download-artifact@v2
         with:
