@@ -7,9 +7,6 @@ on:
         description: 'tag name'     
         required: true
 
-env:
-  RUNID: 613573412
-
 jobs:
   android:
     runs-on: ubuntu-latest
@@ -48,10 +45,12 @@ jobs:
       - name: Download artifact
         uses: dawidd6/action-download-artifact@v2
         with:
+          repo: puerts/backend-quickjs
+          github_token: ${{ secrets.GITHUB_TOKEN }}
           workflow: build_quickjs.yml
-          #run_id: ${{env.RUNID}}
           name: qjs_v8_bin
           path: unity/native_src/
+          run_id: 2780940603
       - name: Install NDK
         run: |
           cd ~

@@ -11,9 +11,6 @@ on:
       - unreal/Puerts/Source/JsEnv/Private/PromiseRejectCallback.hpp
       - .github/workflows/build_unity_plugins.yml
 
-env:
-  RUNID: 613573412
-
 jobs:
   android:
     runs-on: ubuntu-latest
