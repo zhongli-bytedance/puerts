@@ -22,7 +22,7 @@ jobs:
           workflow: build_v8.yml
           name: v8_bin
           path: unity/native_src/
-          run_id: $env.RUNID
+          run_id: ${{env.RUNID}}
       - name: Install NDK
         run: |
           cd ~
