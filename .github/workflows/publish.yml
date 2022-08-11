@@ -7,9 +7,6 @@ on:
         description: 'tag name'     
         required: true
 
-env:
-  RUNID: 613573412
-
 jobs:
   android:
     runs-on: ubuntu-latest
@@ -22,7 +19,6 @@ jobs:
           workflow: build_v8.yml
           name: v8_bin
           path: unity/native_src/
-          run_id: ${{env.RUNID}}
       - name: Install NDK
         run: |
           cd ~
