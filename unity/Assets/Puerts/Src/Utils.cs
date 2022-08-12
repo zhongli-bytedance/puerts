@@ -167,9 +167,10 @@ namespace Puerts
         {
             MethodInfo[] allMethods = type.GetMethods(flag);
             string[] methodNames = allMethods.Select(m => m.Name).ToArray();
-
+            HashSet<string> methodSet = new HashSet<string>();
+            Array.ForEach(allMethods, m => methodSet.Add(m.ToString()));
             Dictionary<string, IEnumerable<Type[]>> errorMethods = type.GetMethods()
-                .Where(m => m.DeclaringType != type && IsError(m))
+                .Where(m => m.DeclaringType != type && IsObsoleteError(m))
                 .GroupBy(m => m.Name)
                 .ToDictionary(i => i.Key, i => i.Cast<MethodInfo>().Select(m => m.GetParameters().Select(o => o.ParameterType).ToArray()));
             IEnumerable<Type[]> matchTypes;
@@ -180,17 +181,25 @@ namespace Puerts
                 type = type.BaseType;
                 MethodInfo[] methods = type.GetMethods(flag)
                     .Where(m => Array.IndexOf<string>(methodNames, m.Name) != -1)
-                    .Where(m => !IsError(m) && !IsVirtualMethod(m))
+                    .Where(m => !IsObsoleteError(m) && !IsVirtualMethod(m))
                     .Where(m => !m.IsSpecialName || !m.Name.StartsWith("get_") && !m.Name.StartsWith("set_"))   //filter property
                     .Where(m => !errorMethods.TryGetValue(m.Name, out matchTypes) || !IsMatchParameters(matchTypes, m.GetParameters().Select(o => o.ParameterType).ToArray()))  //filter override method
+                    .Where(m => !methodSet.Contains(m.ToString()))
                     .ToArray();
                 if (methods.Length > 0)
                 {
+                    Array.ForEach(methods, m => methodSet.Add(m.ToString()));
                     allMethods = allMethods.Concat(methods).ToArray();
                 }
             }
 
             return allMethods;
+        }
+
+        private static bool IsObsoleteError(MemberInfo memberInfo)
+        {
+            var obsolete = memberInfo.GetCustomAttributes(typeof(ObsoleteAttribute), true).FirstOrDefault() as ObsoleteAttribute;
+            return obsolete != null && obsolete.IsError;
         }
         private static bool IsVirtualMethod(MethodInfo memberInfo)
         {
