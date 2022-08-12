@@ -48,8 +48,9 @@ jobs:
       - name: Download artifact
         uses: dawidd6/action-download-artifact@v2
         with:
+          repo: puerts/backend-quickjs
+          github_token: ${{ secrets.GITHUB_TOKEN }}
           workflow: build_quickjs.yml
-          #run_id: ${{env.RUNID}}
           name: qjs_v8_bin
           path: unity/native_src/
       - name: Install NDK
