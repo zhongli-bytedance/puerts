@@ -93,6 +93,20 @@ namespace Puerts
         }
 
         public static bool IsMethodSupportGenerate(MethodInfo method) {
+#if UNITY_2021_1_OR_NEWER
+            // 要看看是否包含引用结构体，有的话先过滤掉
+            var returnType = method.ReturnType;
+            if (returnType.IsByRefLike)
+            {
+                return false;
+            }
+            var methodParameters = method.GetParameters();
+            if (methodParameters.Any(pInfo => pInfo.ParameterType.IsByRefLike))
+            {
+                return false;
+            }
+#endif
+
             // 不包含泛型参数，肯定支持
             if (!method.ContainsGenericParameters)
                 return true;
