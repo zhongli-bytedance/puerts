@@ -453,6 +453,7 @@ namespace Puerts.Editor
             public class ParameterGenInfo : DataTypeInfo
             {
                 public bool IsOut;
+                public bool IsIn;
                 public bool IsByRef;
                 public string ExpectJsType;
                 public string ExpectCsType;
@@ -467,6 +468,7 @@ namespace Puerts.Editor
                     var result = new ParameterGenInfo()
                     {
                         IsOut = !parameterInfo.IsIn && parameterInfo.IsOut && parameterInfo.ParameterType.IsByRef,
+                        IsIn = parameterInfo.IsIn && !parameterInfo.IsOut && parameterInfo.ParameterType.IsByRef,
                         IsByRef = parameterInfo.ParameterType.IsByRef,
                         TypeName = Utils.RemoveRefAndToConstraintType(parameterInfo.ParameterType).GetFriendlyName(),
                         ExpectJsType = Utils.ToCode(ExpectJsType),
