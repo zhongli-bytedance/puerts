@@ -24,6 +24,23 @@ namespace Puerts.Editor
             public const BindingFlags Flags = BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly;
 
             public static List<MethodInfo> filters = null;
+            public static List<MethodInfo> nullables;
+
+            public static int[] getNullParamIndexes(MemberInfo mb)
+            {
+                if (Utils.nullables != null && Utils.nullables.Count > 0)
+                {
+                    foreach (var nullable in Utils.nullables)
+                    {
+                        int[] result = (int[])nullable.Invoke(null, new object[] { mb });
+                        if (result != null)
+                        {
+                            return result;
+                        }
+                    }
+                }
+                return null;
+            }
 
             public static string GetGenName(Type type)
             {
@@ -837,14 +854,14 @@ namespace Puerts.Editor
                     return base.ToString();
                 }
 
-                public static TsParameterGenInfo FromParameterInfo(ParameterInfo parameterInfo, bool isGenericTypeDefinition)
+                public static TsParameterGenInfo FromParameterInfo(ParameterInfo parameterInfo, bool isGenericTypeDefinition, bool nullable)
                 {
                     var isParams = parameterInfo.IsDefined(typeof(ParamArrayAttribute), false);
                     return new TsParameterGenInfo()
                     {
                         Name = parameterInfo.Name,
                         IsByRef = parameterInfo.ParameterType.IsByRef,
-                        TypeName = Utils.GetTsTypeName(Utils.ToConstraintType(parameterInfo.ParameterType, isGenericTypeDefinition), isParams),
+                        TypeName = Utils.GetTsTypeName(Utils.ToConstraintType(parameterInfo.ParameterType, isGenericTypeDefinition), isParams) + (nullable ? " | null" : "") ,
                         IsParams = isParams,
                         IsOptional = parameterInfo.IsOptional
                     };
@@ -901,14 +918,15 @@ namespace Puerts.Editor
 
                 public static TsMethodGenInfo FromMethodBase(MethodBase methodBase, bool isGenericTypeDefinition, bool skipExtentionMethodThis)
                 {
+                    int[] nullInfo = Utils.getNullParamIndexes(methodBase);
                     return new TsMethodGenInfo()
                     {
                         Name = methodBase.IsConstructor ? "constructor" : methodBase.Name,
                         Document = DocResolver.GetTsDocument(methodBase),
                         ParameterInfos = methodBase.GetParameters()
                             .Skip(skipExtentionMethodThis && Utils.isDefined(methodBase, typeof(ExtensionAttribute)) ? 1 : 0)
-                            .Select(info => TsParameterGenInfo.FromParameterInfo(info, isGenericTypeDefinition)).ToArray(),
-                        TypeName = methodBase.IsConstructor ? "" : Utils.GetTsTypeName(Utils.ToConstraintType((methodBase as MethodInfo).ReturnType, isGenericTypeDefinition)),
+                            .Select((info, idx) => TsParameterGenInfo.FromParameterInfo(info, isGenericTypeDefinition, nullInfo?.Contains(idx) ?? false)).ToArray(),
+                        TypeName = methodBase.IsConstructor ? "" : Utils.GetTsTypeName(Utils.ToConstraintType((methodBase as MethodInfo).ReturnType, isGenericTypeDefinition)) + ((nullInfo?.Contains(-1) ?? false) ? " | null" : ""),
                         IsConstructor = methodBase.IsConstructor,
                         IsStatic = methodBase.IsStatic,
                     };
@@ -1051,7 +1069,7 @@ namespace Puerts.Editor
                             {
                                 Name = f.Name,
                                 Document = DocResolver.GetTsDocument(f),
-                                TypeName = Utils.GetTsTypeName(f.FieldType),
+                                TypeName = Utils.GetTsTypeName(f.FieldType) + (Utils.getNullParamIndexes(f) != null ? " | null" : ""),
                                 IsStatic = f.IsStatic
                             })
                             .Concat(
@@ -1060,7 +1078,7 @@ namespace Puerts.Editor
                                 {
                                     Name = p.Name,
                                     Document = DocResolver.GetTsDocument(p),
-                                    TypeName = Utils.GetTsTypeName(p.PropertyType),
+                                    TypeName = Utils.GetTsTypeName(p.PropertyType) + (Utils.getNullParamIndexes(p) != null ? " | null" : ""),
                                     IsStatic = Utils.IsStatic(p),
                                     HasGetter = p.GetGetMethod() != null && p.GetGetMethod().IsPublic,
                                     HasSetter = p.GetSetMethod() != null && p.GetSetMethod().IsPublic
@@ -1522,6 +1540,7 @@ namespace Puerts.Editor
                         .Distinct()
                         .ToList();
                 }
+                Utils.nullables = Configure.GetNullables();
 
                 var tsTypes = configure["Puerts.TypingAttribute"].Select(kv => kv.Key)
                     .Where(o => o is Type)
