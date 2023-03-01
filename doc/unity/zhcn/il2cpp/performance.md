@@ -3,7 +3,7 @@ il2cpp绑定主要优化的是**跨语言性能**，从我们的测试结果上�
 * 在安卓上，普洱的跨语言性能已经是xlua的10倍
 * ios上稍弱，但可以说比xlua略优（无参或者参数为基本数据类型时稍慢，参数为对象时倍数级领先xlua）。
 
-测试基准项目由社区大佬的 [throw-out/PerformanceTesting](https://github.com/throw-out/PerformanceTesting) 修改而成。
+测试基准项目由社区大佬 [@throw-out](https://github.com/throw-out) 的性能测试项目修改而成，可参见[该fork](https://github.com/puerts/PerformanceTesting)。
 
 
 > 受环境影响以下数据可能会有略微误差。
