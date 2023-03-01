@@ -7,7 +7,10 @@ il2cpp绑定主要优化的是**跨语言性能**，从我们的测试结果上�
 
 
 > 受环境影响以下数据可能会有略微误差。
+
 > 关注跨语言数据时，尤其对于结构体的case，可减去C#的耗时（即API本身耗时）来考虑。
+
+> 此处puer v1的数据会比throw-out原项目的数据好，是因为这个PR优化之后导致的： https://github.com/throw-out/PerformanceTesting/pull/2
 
 ### 安卓所有数据 (Vivo Neo6SE)
 | Method                                                | Static  | Call         | csharp(ms)   | xLua(ms)  | puerts v1 with wrapper(ms) | puerts v2 reflection (ms) | puerts v2 with wrapper (ms)
